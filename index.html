@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoldVision AI Trader Analyst</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #0b1120;
+      color: white;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #f5c542;
+      margin-top: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aab4c5;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #121a2b;
+      border: 1px solid #26334d;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 15px;
+      background: #0b1120;
+      color: white;
+      border-radius: 10px;
+      border: 1px solid #34415c;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 15px;
+      border: 0;
+      border-radius: 10px;
+      background: #f5c542;
+      color: #111827;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #preview {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .result {
+      line-height: 1.7;
+      color: #dbe4f5;
+    }
+
+    .signal {
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      margin: 15px 0;
+      color: #f5c542;
+    }
+
+    .warning {
+      color: #ffcc66;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="logo">GOLDVISION AI</div>
+
+    <div class="subtitle">
+      AI Trader Analyst • XAUUSD / BTCUSD
+    </div>
+
+    <div class="card">
+
+      <h2>📸 Analisa Chart</h2>
+
+      <p>
+        Kirim screenshot chart MT5 atau TradingView.
+      </p>
+
+      <input
+        type="file"
+        id="chartImage"
+        accept="image/*"
+      >
+
+      <img id="preview">
+
+      <button onclick="analyzeChart()">
+        🔍 ANALISA CHART
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <h2>📊 Hasil Analisa</h2>
+
+      <div id="result" class="result">
+
+        <div class="signal">
+          WAIT
+        </div>
+
+        <p>
+          Upload screenshot chart terlebih dahulu.
+        </p>
+
+        <p>
+          GoldVision nantinya akan membaca:
+        </p>
+
+        <p>
+          • Trend<br>
+          • Support & Resistance<br>
+          • Supply & Demand<br>
+          • FVG / Order Block<br>
+          • Break of Structure<br>
+          • Entry BUY / SELL<br>
+          • Stop Loss<br>
+          • Take Profit
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="warning">
+      ⚠️ Analisa AI bukan jaminan profit. Selalu gunakan manajemen risiko.
+    </div>
+
+  </div>
+
+<script>
+
+const imageInput = document.getElementById("chartImage");
+const preview = document.getElementById("preview");
+
+imageInput.addEventListener("change", function() {
+
+  const file = this.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    preview.src = e.target.result;
+    preview.style.display = "block";
+  };
+
+  reader.readAsDataURL(file);
+
+});
+
+function analyzeChart() {
+
+  const file = imageInput.files[0];
+
+  if (!file) {
+    alert("Silakan upload screenshot chart terlebih dahulu.");
+    return;
+  }
+
+  document.getElementById("result").innerHTML = `
+
+    <div class="signal">
+      ANALYZING...
+    </div>
+
+    <p>
+      📸 Screenshot berhasil diterima.
+    </p>
+
+    <p>
+      GoldVision sedang menyiapkan analisa chart.
+    </p>
+
+    <p>
+      Backend AI akan kita sambungkan pada langkah berikutnya.
+    </p>
+
+  `;
+
+}
+
+</script>
+
+</body>
+</html>
