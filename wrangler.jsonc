@@ -1,0 +1,10 @@
+{
+  "name": "goldvision-ai-trader-analyst",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-19",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  }
+}
