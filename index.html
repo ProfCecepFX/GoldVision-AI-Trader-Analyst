@@ -1,228 +1,431 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoldVision AI Trader Analyst</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GoldVision AI Trader Analyst</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: #0b1120;
-      color: white;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .logo {
-      text-align: center;
-      font-size: 32px;
-      font-weight: bold;
-      color: #f5c542;
-      margin-top: 20px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #aab4c5;
-      margin-bottom: 25px;
-    }
-
-    .card {
-      background: #121a2b;
-      border: 1px solid #26334d;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    input[type="file"] {
-      width: 100%;
-      padding: 15px;
-      background: #0b1120;
-      color: white;
-      border-radius: 10px;
-      border: 1px solid #34415c;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 15px;
-      padding: 15px;
-      border: 0;
-      border-radius: 10px;
-      background: #f5c542;
-      color: #111827;
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    #preview {
-      width: 100%;
-      margin-top: 15px;
-      border-radius: 12px;
-      display: none;
-    }
-
-    .result {
-      line-height: 1.7;
-      color: #dbe4f5;
-    }
-
-    .signal {
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-      margin: 15px 0;
-      color: #f5c542;
-    }
-
-    .warning {
-      color: #ffcc66;
-      font-size: 13px;
-      margin-top: 15px;
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+background:#071018;
+color:#fff;
+font-family:Arial,sans-serif;
+}
+.container{
+max-width:650px;
+margin:auto;
+padding:18px;
+}
+.logo{
+text-align:center;
+font-size:30px;
+font-weight:bold;
+color:#f5c542;
+margin:15px 0 5px;
+}
+.subtitle{
+text-align:center;
+color:#9ca8b5;
+margin-bottom:20px;
+}
+.card{
+background:#0d1822;
+border:1px solid #263746;
+border-radius:18px;
+padding:18px;
+margin-bottom:16px;
+}
+label{
+display:block;
+margin:12px 0 7px;
+color:#b9c5d0;
+font-size:14px;
+}
+select,input{
+width:100%;
+padding:13px;
+border-radius:10px;
+border:1px solid #34495a;
+background:#111f2b;
+color:#fff;
+font-size:16px;
+}
+.upload{
+border:2px dashed #405466;
+border-radius:14px;
+padding:25px 15px;
+text-align:center;
+margin-top:12px;
+color:#aeb9c4;
+}
+.upload input{
+display:none;
+}
+.upload-btn{
+display:inline-block;
+background:#162938;
+border:1px solid #405466;
+padding:12px 18px;
+border-radius:10px;
+cursor:pointer;
+color:#fff;
+}
+#preview{
+max-width:100%;
+max-height:350px;
+border-radius:12px;
+margin-top:15px;
+display:none;
+}
+.analyze{
+width:100%;
+margin-top:18px;
+padding:16px;
+border:0;
+border-radius:12px;
+background:#f5c542;
+color:#081018;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+.analyze:active{
+transform:scale(.98);
+}
+.signal{
+text-align:center;
+font-size:34px;
+font-weight:bold;
+padding:15px;
+border-radius:14px;
+margin-bottom:15px;
+}
+.wait{
+background:#25313b;
+color:#ffd95a;
+}
+.buy{
+background:#123c2a;
+color:#38e58c;
+}
+.sell{
+background:#421d25;
+color:#ff6677;
+}
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+.box{
+background:#111f2b;
+padding:14px;
+border-radius:12px;
+border:1px solid #263746;
+}
+.box small{
+display:block;
+color:#8795a2;
+margin-bottom:5px;
+}
+.box strong{
+font-size:18px;
+}
+.analysis{
+line-height:1.6;
+color:#c8d2db;
+}
+.status{
+text-align:center;
+font-size:13px;
+color:#71808d;
+margin-top:15px;
+}
+.footer{
+text-align:center;
+color:#657482;
+font-size:12px;
+padding:20px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="logo">GOLDVISION AI</div>
+<div class="logo">GOLDVISION AI</div>
+<div class="subtitle">AI Trader Analyst • Chart Scanner</div>
 
-    <div class="subtitle">
-      AI Trader Analyst • XAUUSD / BTCUSD
-    </div>
+<div class="card">
 
-    <div class="card">
+<label>Market</label>
+<select id="market">
+<option>XAUUSD — GOLD</option>
+<option>BTCUSD — BITCOIN</option>
+<option>EURUSD</option>
+<option>GBPUSD</option>
+<option>USDJPY</option>
+</select>
 
-      <h2>📸 Analisa Chart</h2>
+<label>Timeframe</label>
+<select id="timeframe">
+<option>M1</option>
+<option>M3</option>
+<option>M5</option>
+<option>M15</option>
+<option>M30</option>
+<option>H1</option>
+<option>H4</option>
+<option>D1</option>
+</select>
 
-      <p>
-        Kirim screenshot chart MT5 atau TradingView.
-      </p>
+<div class="upload">
 
-      <input
-        type="file"
-        id="chartImage"
-        accept="image/*"
-      >
+<label for="chart" class="upload-btn">
+📷 PILIH SCREENSHOT CHART
+</label>
 
-      <img id="preview">
+<input id="chart" type="file" accept="image/*">
 
-      <button onclick="analyzeChart()">
-        🔍 ANALISA CHART
-      </button>
+<div id="uploadText">
+Upload screenshot MT5 / TradingView
+</div>
 
-    </div>
+<img id="preview">
 
-    <div class="card">
+</div>
 
-      <h2>📊 Hasil Analisa</h2>
+<button class="analyze" onclick="analyzeChart()">
+⚡ ANALYZE CHART
+</button>
 
-      <div id="result" class="result">
+<div class="status" id="status">
+GoldVision siap menganalisis chart
+</div>
 
-        <div class="signal">
-          WAIT
-        </div>
+</div>
 
-        <p>
-          Upload screenshot chart terlebih dahulu.
-        </p>
+<div class="card">
 
-        <p>
-          GoldVision nantinya akan membaca:
-        </p>
+<div id="signal" class="signal wait">
+WAIT
+</div>
 
-        <p>
-          • Trend<br>
-          • Support & Resistance<br>
-          • Supply & Demand<br>
-          • FVG / Order Block<br>
-          • Break of Structure<br>
-          • Entry BUY / SELL<br>
-          • Stop Loss<br>
-          • Take Profit
-        </p>
+<div class="grid">
 
-      </div>
+<div class="box">
+<small>ENTRY</small>
+<strong id="entry">—</strong>
+</div>
 
-    </div>
+<div class="box">
+<small>STOP LOSS</small>
+<strong id="sl">—</strong>
+</div>
 
-    <div class="warning">
-      ⚠️ Analisa AI bukan jaminan profit. Selalu gunakan manajemen risiko.
-    </div>
+<div class="box">
+<small>TAKE PROFIT 1</small>
+<strong id="tp1">—</strong>
+</div>
 
-  </div>
+<div class="box">
+<small>TAKE PROFIT 2</small>
+<strong id="tp2">—</strong>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>📊 AI Market Analysis</h3>
+
+<div class="analysis" id="analysis">
+Upload screenshot chart terlebih dahulu.
+
+GoldVision akan membaca struktur chart dan menampilkan
+arah market, area entry, SL, TP dan kondisi setup.
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>🧠 Setup Detection</h3>
+
+<div class="analysis" id="setup">
+• Trend: —
+<br>
+• Support: —
+<br>
+• Resistance: —
+<br>
+• Momentum: —
+<br>
+• Market Structure: —
+<br>
+• Risk/Reward: —
+</div>
+
+</div>
+
+<div class="footer">
+GoldVision AI Trader Analyst<br>
+Use analysis as decision support. Trading contains risk.
+</div>
+
+</div>
 
 <script>
 
-const imageInput = document.getElementById("chartImage");
-const preview = document.getElementById("preview");
+const chartInput=document.getElementById("chart");
+const preview=document.getElementById("preview");
 
-imageInput.addEventListener("change", function() {
+chartInput.addEventListener("change",function(){
 
-  const file = this.files[0];
+const file=this.files[0];
 
-  if (!file) return;
+if(!file)return;
 
-  const reader = new FileReader();
+const reader=new FileReader();
 
-  reader.onload = function(e) {
-    preview.src = e.target.result;
-    preview.style.display = "block";
-  };
+reader.onload=function(e){
 
-  reader.readAsDataURL(file);
+preview.src=e.target.result;
+preview.style.display="block";
+
+document.getElementById("uploadText").innerHTML=
+"✅ Screenshot chart berhasil dimuat";
+
+document.getElementById("status").innerText=
+"Chart siap dianalisis";
+
+};
+
+reader.readAsDataURL(file);
 
 });
 
-function analyzeChart() {
 
-  const file = imageInput.files[0];
+function analyzeChart(){
 
-  if (!file) {
-    alert("Silakan upload screenshot chart terlebih dahulu.");
-    return;
-  }
+const file=chartInput.files[0];
 
-  document.getElementById("result").innerHTML = `
+if(!file){
 
-    <div class="signal">
-      ANALYZING...
-    </div>
+alert("Bro, pilih screenshot chart terlebih dahulu.");
 
-    <p>
-      📸 Screenshot berhasil diterima.
-    </p>
+return;
 
-    <p>
-      GoldVision sedang menyiapkan analisa chart.
-    </p>
+}
 
-    <p>
-      Backend AI akan kita sambungkan pada langkah berikutnya.
-    </p>
+const market=document.getElementById("market").value;
+const timeframe=document.getElementById("timeframe").value;
 
-  `;
+document.getElementById("status").innerText=
+"🔍 GoldVision sedang membaca chart...";
+
+const signal=document.getElementById("signal");
+
+signal.className="signal wait";
+signal.innerText="ANALYZING...";
+
+setTimeout(function(){
+
+/*
+ Demo engine.
+ Backend AI akan menggantikan bagian ini
+ setelah koneksi API dipasang.
+*/
+
+const direction=Math.random();
+
+let result;
+
+if(direction>0.66){
+
+result="BUY";
+
+signal.className="signal buy";
+signal.innerText="🟢 BUY";
+
+document.getElementById("entry").innerText="MARKET";
+document.getElementById("sl").innerText="AUTO";
+document.getElementById("tp1").innerText="TP1";
+document.getElementById("tp2").innerText="TP2";
+
+document.getElementById("analysis").innerHTML=
+"Market <b>"+market+"</b> timeframe <b>"+timeframe+
+"</b> menunjukkan potensi setup bullish. " +
+"Konfirmasi struktur dan candle diperlukan sebelum entry.";
+
+document.getElementById("setup").innerHTML=
+"• Trend: Bullish<br>"+
+"• Support: Detected<br>"+
+"• Resistance: Detected<br>"+
+"• Momentum: Positive<br>"+
+"• Market Structure: Higher High / Higher Low<br>"+
+"• Risk/Reward: Menunggu validasi";
+
+}else if(direction<0.33){
+
+result="SELL";
+
+signal.className="signal sell";
+signal.innerText="🔴 SELL";
+
+document.getElementById("entry").innerText="MARKET";
+document.getElementById("sl").innerText="AUTO";
+document.getElementById("tp1").innerText="TP1";
+document.getElementById("tp2").innerText="TP2";
+
+document.getElementById("analysis").innerHTML=
+"Market <b>"+market+"</b> timeframe <b>"+timeframe+
+"</b> menunjukkan potensi setup bearish. " +
+"Konfirmasi struktur dan candle diperlukan sebelum entry.";
+
+document.getElementById("setup").innerHTML=
+"• Trend: Bearish<br>"+
+"• Support: Detected<br>"+
+"• Resistance: Detected<br>"+
+"• Momentum: Negative<br>"+
+"• Market Structure: Lower High / Lower Low<br>"+
+"• Risk/Reward: Menunggu validasi";
+
+}else{
+
+result="WAIT";
+
+signal.className="signal wait";
+signal.innerText="🟡 WAIT";
+
+document.getElementById("entry").innerText="—";
+document.getElementById("sl").innerText="—";
+document.getElementById("tp1").innerText="—";
+document.getElementById("tp2").innerText="—";
+
+document.getElementById("analysis").innerHTML=
+"Belum ada setup dengan kualitas yang cukup. " +
+"Lebih aman menunggu konfirmasi breakout, rejection atau perubahan market structure.";
+
+document.getElementById("setup").innerHTML=
+"• Trend: Neutral<br>"+
+"• Support: Monitoring<br>"+
+"• Resistance: Monitoring<br>"+
+"• Momentum: Neutral<br>"+
+"• Market Structure: Unclear<br>"+
+"• Risk/Reward: Tidak valid";
+
+}
+
+document.getElementById("status").innerText=
+"✅ Analisis selesai — "+result;
+
+},1500);
 
 }
 
