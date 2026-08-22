@@ -334,100 +334,86 @@ const signal=document.getElementById("signal");
 signal.className="signal wait";
 signal.innerText="ANALYZING...";
 
-setTimeout(function(){
+  const reader = new FileReader();
 
-/*
- Demo engine.
- Backend AI akan menggantikan bagian ini
- setelah koneksi API dipasang.
-*/
+  reader.onload = async function(){
+    try{
 
-const direction=Math.random();
+      const image = reader.result;
 
-let result;
+      const response = await fetch("/api/analyze",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          image:image,
+          market:market.value || "XAUUSD",
+          timeframe:timeframe.value || "M15"
+        })
+      });
 
-if(direction>0.66){
+      if(!response.ok){
+        throw new Error("API error " + response.status);
+      }
 
-result="BUY";
+      const data = await response.json();
 
-signal.className="signal buy";
-signal.innerText="🟢 BUY";
+      const result = data.result || data.signal || data.direction || "WAIT";
 
-document.getElementById("entry").innerText="MARKET";
-document.getElementById("sl").innerText="AUTO";
-document.getElementById("tp1").innerText="TP1";
-document.getElementById("tp2").innerText="TP2";
+      signal.className="signal";
 
-document.getElementById("analysis").innerHTML=
-"Market <b>"+market+"</b> timeframe <b>"+timeframe+
-"</b> menunjukkan potensi setup bullish. " +
-"Konfirmasi struktur dan candle diperlukan sebelum entry.";
+      if(result.toUpperCase().includes("BUY")){
+        signal.classList.add("buy");
+        signal.innerText="🟢 BUY";
+      }
+      else if(result.toUpperCase().includes("SELL")){
+        signal.classList.add("sell");
+        signal.innerText="🔴 SELL";
+      }
+      else{
+        signal.classList.add("wait");
+        signal.innerText="🟡 WAIT";
+      }
 
-document.getElementById("setup").innerHTML=
-"• Trend: Bullish<br>"+
-"• Support: Detected<br>"+
-"• Resistance: Detected<br>"+
-"• Momentum: Positive<br>"+
-"• Market Structure: Higher High / Higher Low<br>"+
-"• Risk/Reward: Menunggu validasi";
+      document.getElementById("entry").innerText =
+        data.entry || data.entry_price || "-";
 
-}else if(direction<0.33){
+      document.getElementById("sl").innerText =
+        data.sl || data.stop_loss || "-";
 
-result="SELL";
+      document.getElementById("tp1").innerText =
+        data.tp1 || "-";
 
-signal.className="signal sell";
-signal.innerText="🔴 SELL";
+      document.getElementById("tp2").innerText =
+        data.tp2 || "-";
 
-document.getElementById("entry").innerText="MARKET";
-document.getElementById("sl").innerText="AUTO";
-document.getElementById("tp1").innerText="TP1";
-document.getElementById("tp2").innerText="TP2";
+      document.getElementById("analysis").innerHTML =
+        data.analysis ||
+        data.reason ||
+        "Analisis selesai.";
 
-document.getElementById("analysis").innerHTML=
-"Market <b>"+market+"</b> timeframe <b>"+timeframe+
-"</b> menunjukkan potensi setup bearish. " +
-"Konfirmasi struktur dan candle diperlukan sebelum entry.";
+      document.getElementById("setup").innerHTML =
+        data.setup ||
+        "Setup tersedia berdasarkan hasil analisis AI.";
 
-document.getElementById("setup").innerHTML=
-"• Trend: Bearish<br>"+
-"• Support: Detected<br>"+
-"• Resistance: Detected<br>"+
-"• Momentum: Negative<br>"+
-"• Market Structure: Lower High / Lower Low<br>"+
-"• Risk/Reward: Menunggu validasi";
+      document.getElementById("status").innerText =
+        "✅ Analisis AI selesai — " + result;
 
-}else{
+    }catch(error){
 
-result="WAIT";
+      console.error(error);
 
-signal.className="signal wait";
-signal.innerText="🟡 WAIT";
+      signal.className="signal signal_wait";
+      signal.innerText="⚠️ ERROR";
 
-document.getElementById("entry").innerText="—";
-document.getElementById("sl").innerText="—";
-document.getElementById("tp1").innerText="—";
-document.getElementById("tp2").innerText="—";
+      document.getElementById("status").innerText =
+        "❌ Gagal menghubungi AI: " + error.message;
 
-document.getElementById("analysis").innerHTML=
-"Belum ada setup dengan kualitas yang cukup. " +
-"Lebih aman menunggu konfirmasi breakout, rejection atau perubahan market structure.";
+    }
+  };
 
-document.getElementById("setup").innerHTML=
-"• Trend: Neutral<br>"+
-"• Support: Monitoring<br>"+
-"• Resistance: Monitoring<br>"+
-"• Momentum: Neutral<br>"+
-"• Market Structure: Unclear<br>"+
-"• Risk/Reward: Tidak valid";
-
-}
-
-document.getElementById("status").innerText=
-"✅ Analisis selesai — "+result;
-
-},1500);
-
-}
+  reader.readAsDataURL(file);
 
 </script>
 
