@@ -177,6 +177,10 @@ signal = "BUY" atau "SELL"
 Confidence harus angka 0-100.
 
 Berikan alasan teknikal yang spesifik terhadap chart.
+
+Tambahkan juga di JSON:
+- "analysis": ringkasan analisa dalam 2-4 kalimat bahasa Indonesia (gabungan dari alasan teknikal di atas, jelaskan kenapa signal ini muncul atau kenapa harus WAIT).
+- "entry_y_pct", "sl_y_pct", "tp1_y_pct", "tp2_y_pct": estimasi posisi vertikal level tersebut di dalam GAMBAR yang kamu terima, dalam persen (0 = paling atas gambar, 100 = paling bawah gambar). Perkirakan setepat mungkin berdasarkan posisi candle/harga yang kamu lihat. Kalau signal WAIT atau level tidak jelas, isi null.
 `;
 
         // =========================
@@ -328,6 +332,10 @@ Berikan alasan teknikal yang spesifik terhadap chart.
           result.tp1 = null;
           result.tp2 = null;
           result.tp3 = null;
+          result.entry_y_pct = null;
+          result.sl_y_pct = null;
+          result.tp1_y_pct = null;
+          result.tp2_y_pct = null;
         }
 
         // =========================
@@ -345,6 +353,8 @@ Berikan alasan teknikal yang spesifik terhadap chart.
 
           setup: result.setup || "Tidak ada setup valid.",
 
+          analysis: result.analysis || (Array.isArray(result.reasons) ? result.reasons.join(" ") : "Analisis selesai."),
+
           entry: result.entry ?? null,
 
           sl: result.sl ?? null,
@@ -352,6 +362,11 @@ Berikan alasan teknikal yang spesifik terhadap chart.
           tp1: result.tp1 ?? null,
           tp2: result.tp2 ?? null,
           tp3: result.tp3 ?? null,
+
+          entry_y_pct: result.entry_y_pct ?? null,
+          sl_y_pct: result.sl_y_pct ?? null,
+          tp1_y_pct: result.tp1_y_pct ?? null,
+          tp2_y_pct: result.tp2_y_pct ?? null,
 
           rr: result.rr ?? null,
 
