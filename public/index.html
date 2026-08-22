@@ -72,12 +72,25 @@ border-radius:10px;
 cursor:pointer;
 color:#fff;
 }
-#preview{
-max-width:100%;
-max-height:350px;
-border-radius:12px;
-margin-top:15px;
+.chart-wrap{
+position:relative;
 display:none;
+margin-top:15px;
+}
+#preview{
+width:100%;
+max-height:350px;
+object-fit:contain;
+border-radius:12px;
+display:block;
+}
+#overlay{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
 }
 .analyze{
 width:100%;
@@ -149,6 +162,9 @@ color:#657482;
 font-size:12px;
 padding:20px;
 }
+.setup-title{
+margin-top:0;
+}
 </style>
 </head>
 
@@ -194,7 +210,10 @@ padding:20px;
 Upload screenshot MT5 / TradingView
 </div>
 
+<div class="chart-wrap" id="chartWrap">
 <img id="preview">
+<canvas id="overlay"></canvas>
+</div>
 
 </div>
 
@@ -273,6 +292,19 @@ arah market, area entry, SL, TP dan kondisi setup.
 
 </div>
 
+<div class="card" id="setupImageCard" style="display:none;">
+
+<h3 class="setup-title">🖼️ Gambar Setup Lengkap</h3>
+<div class="chart-wrap" id="chartWrap2" style="display:block;">
+<img id="preview2">
+<canvas id="overlay2"></canvas>
+</div>
+<div class="status" style="margin-top:10px;">
+Garis di bawah ini estimasi AI berdasarkan pembacaan gambar, bukan posisi pixel presisi.
+</div>
+
+</div>
+
 <div class="footer">
 GoldVision AI Trader Analyst<br>
 Use analysis as decision support. Trading contains risk.
@@ -284,6 +316,9 @@ Use analysis as decision support. Trading contains risk.
 
 const chartInput=document.getElementById("chart");
 const preview=document.getElementById("preview");
+const chartWrap=document.getElementById("chartWrap");
+
+let lastImageDataUrl = null;
 
 chartInput.addEventListener("change",function(){
 
@@ -295,8 +330,10 @@ const reader=new FileReader();
 
 reader.onload=function(e){
 
+lastImageDataUrl = e.target.result;
+
 preview.src=e.target.result;
-preview.style.display="block";
+chartWrap.style.display="block";
 
 document.getElementById("uploadText").innerHTML=
 "✅ Screenshot chart berhasil dimuat";
@@ -304,11 +341,78 @@ document.getElementById("uploadText").innerHTML=
 document.getElementById("status").innerText=
 "Chart siap dianalisis";
 
+// reset overlay lama kalau ganti gambar baru
+const overlay=document.getElementById("overlay");
+const ctx=overlay.getContext("2d");
+ctx.clearRect(0,0,overlay.width,overlay.height);
+document.getElementById("setupImageCard").style.display="none";
+
 };
 
 reader.readAsDataURL(file);
 
 });
+
+
+// ================= GAMBAR OVERLAY GARIS SETUP DI ATAS SCREENSHOT =================
+function drawLevelLine(ctx, width, yPct, color, text){
+  if(yPct===undefined || yPct===null || yPct==="" || isNaN(yPct)) return;
+
+  const y = (yPct/100) * ctx.canvas.height;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  ctx.lineTo(width,y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font = "bold 12px Arial";
+  const paddingX = 6;
+  const textWidth = ctx.measureText(text).width;
+
+  ctx.fillStyle = color;
+  ctx.fillRect(4, y-16, textWidth + paddingX*2, 16);
+
+  ctx.fillStyle = "#081018";
+  ctx.fillText(text, 4+paddingX, y-4);
+}
+
+function drawSetupOverlay(imgEl, canvasEl, data){
+  const overlay = canvasEl;
+  const rect = imgEl.getBoundingClientRect();
+
+  overlay.width = imgEl.clientWidth;
+  overlay.height = imgEl.clientHeight;
+
+  const ctx = overlay.getContext("2d");
+  ctx.clearRect(0,0,overlay.width,overlay.height);
+
+  drawLevelLine(ctx, overlay.width, data.entry_y_pct, "#f5c542", "ENTRY " + (data.entry || ""));
+  drawLevelLine(ctx, overlay.width, data.sl_y_pct, "#ff6677", "SL " + (data.sl || ""));
+  drawLevelLine(ctx, overlay.width, data.tp1_y_pct, "#38e58c", "TP1 " + (data.tp1 || ""));
+  drawLevelLine(ctx, overlay.width, data.tp2_y_pct, "#2fd67a", "TP2 " + (data.tp2 || ""));
+}
+
+function showSetupImage(data){
+  const preview2 = document.getElementById("preview2");
+  const overlay2 = document.getElementById("overlay2");
+  const card = document.getElementById("setupImageCard");
+
+  preview2.src = lastImageDataUrl;
+  card.style.display = "block";
+
+  preview2.onload = function(){
+    drawSetupOverlay(preview2, overlay2, data);
+  };
+
+  // kalau gambar sudah pernah kebuka (cached), onload kadang tidak trigger lagi -> gambar manual juga
+  if(preview2.complete){
+    drawSetupOverlay(preview2, overlay2, data);
+  }
+}
 
 
 function analyzeChart(){
@@ -348,8 +452,8 @@ signal.innerText="ANALYZING...";
         },
         body:JSON.stringify({
           image:image,
-          market:market.value || "XAUUSD",
-          timeframe:timeframe.value || "M15"
+          market:market || "XAUUSD",
+          timeframe:timeframe || "M15"
         })
       });
 
@@ -400,11 +504,14 @@ signal.innerText="ANALYZING...";
       document.getElementById("status").innerText =
         "✅ Analisis AI selesai — " + result;
 
+      // ==== TAMPILKAN GAMBAR SETUP LENGKAP DENGAN GARIS ENTRY/SL/TP ====
+      showSetupImage(data);
+
     }catch(error){
 
       console.error(error);
 
-      signal.className="signal signal_wait";
+      signal.className="signal wait";
       signal.innerText="⚠️ ERROR";
 
       document.getElementById("status").innerText =
@@ -414,6 +521,8 @@ signal.innerText="ANALYZING...";
   };
 
   reader.readAsDataURL(file);
+
+}
 
 </script>
 
